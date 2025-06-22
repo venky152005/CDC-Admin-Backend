@@ -33,7 +33,13 @@ export const login = async (req: Request, res: Response):Promise<any> => {
 
         const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET_ADMIN, { expiresIn: "15h" });
 
-        res.status(200).json({ message: "Login successful", token, success: true });
+
+        res.cookie("adminToken", token, {
+            httpOnly: true, 
+            secure: true, 
+            sameSite: "strict", 
+            maxAge: 15 * 60 * 60 * 1000, 
+        }).status(200).json({ message: "Login successful", success: true });
     } catch (error) {
         res.status(500).json({ message: error, success: false });
     }

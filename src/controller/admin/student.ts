@@ -27,7 +27,7 @@ export const addStudents = async(req: Request, res: Response)=>{
 
         const student = await User.insertMany(users, {ordered: false})
 
-      res.status(200).json({message:"Successfully student created", student, StudentsCount: student.length})
+      res.status(200).json({message:"Successfully student created",success:true, student, StudentsCount: student.length})
      } catch (error) {
         res.status(500).json({message:"Failed to add students",error:(error as Error).message})
      }
@@ -77,5 +77,26 @@ export const getStudents = async(req: Request, res: Response)=>{
         res.status(200).json({students});
     } catch (error) {
         res.status(500).json({message:"Failed to get students",error:(error as Error).message})
+    }
+}
+
+
+export const deleteStudent = async (req: Request, res: Response):Promise<any> => {
+    try {
+        const { _id } = req.body;
+
+        if(!_id){
+            return res.status(400).json({ message: "Id is required" });
+        }
+
+        const deletedUser = await User.findByIdAndDelete(_id);
+
+        if(!deletedUser){
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({ message: "User deleted successfully", success: true });
+    } catch (error) {
+        res.status(500).json({ message: error, success: false });
     }
 }
