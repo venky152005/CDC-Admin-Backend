@@ -8,8 +8,7 @@ export interface AdminRequest extends Request {
 }
 
 export const adminMiddleware = async(req: AdminRequest, res:Response, next: NextFunction)=>{
-    const token = req.cookies.adminToken;
-
+    const token = req.cookies.adminToken || req.headers.authorization?.split(" ")[1];
     console.log(token);
 
     if(!token){
