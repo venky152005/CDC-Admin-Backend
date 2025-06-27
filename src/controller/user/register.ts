@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { sendEmail } from "../../controller/user/email";
 import Register from "../../model/register.model";
 
 export const register = async (req: Request, res: Response): Promise<any> => {
@@ -107,6 +108,79 @@ export const register = async (req: Request, res: Response): Promise<any> => {
             activeBacklogs 
         });
         await register.save();
+
+        if(!register){
+            return res.status(400).json({message: "Failed to register"});
+        }
+
+        await sendEmail(email, "Registration Successful", `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registration Confirmation</title>
+</head>
+<body style="font-family: 'Segoe UI', sans-serif; background-color: #f9f9f9; margin: 0; padding: 0;">
+  <table align="center" width="100%" cellpadding="0" cellspacing="0" style="padding: 30px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" style="background-color: #ffffff; border-radius: 10px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <tr>
+            <td align="center" style="padding-bottom: 20px;">
+              <!-- Logo Placeholder -->
+              <img src="https://yt3.googleusercontent.com/pDqWRSkJM6LdfkkCFByEWK4lbIZsetVP17jR_edTMLxcsUcSO4nfmEAxyF4CSZTZMUHQ_G8q=s900-c-k-c0x00ffffff-no-rj" alt="Logo" style="max-width: 120px;">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <h2 style="font-size: 24px; color: #333; text-align: center;">Registration Successful</h2>
+              <p style="font-size: 16px; color: #555; text-align: center;">
+                Dear <strong>${studentName}</strong>,<br />
+                Thank you for completing your registration. We have successfully received your information.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding: 20px;">
+              <div style="background-color: #eaf6ff; padding: 20px; border-radius: 8px; display: inline-block;">
+                <p style="margin: 0; font-size: 16px; color: #007BFF;">Your Register Number</p>
+                <p style="font-size: 20px; font-weight: bold; color: #0056b3;">${registerNumber}</p>
+              </div>
+            </td>
+          </tr>
+            <tr>
+                <td style="padding: 20px; text-align: center;">
+                <p style="font-size: 16px; color: #555;">
+                    We are excited to have you on board. You can now access all the features and resources available to our registered users.
+                </p>
+                </td>
+          <tr>
+            <td style="padding-top: 30px;">
+              <p style="text-align: center; color: #777; font-size: 14px;">
+                If you have any questions, feel free to reply to this email.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding: 20px 0;">
+              <!-- Social Media Icons -->
+              <a href="#"><img src="[FACEBOOK_ICON]" alt="Facebook" style="width: 24px; margin: 0 10px;"></a>
+              <a href="#"><img src="[TWITTER_ICON]" alt="Twitter" style="width: 24px; margin: 0 10px;"></a>
+              <a href="#"><img src="[INSTAGRAM_ICON]" alt="Instagram" style="width: 24px; margin: 0 10px;"></a>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center; color: #aaa; font-size: 12px; padding-top: 10px;">
+              © 2025 CDC or Your Jeppiaar Institute of Technology . All rights reserved.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`);
+
         return res.status(200).json({message: "Register successfully", register, success: true});
     }catch(error){
         return res.status(500).json({message: "Internal server error", error, success: false});

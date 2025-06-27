@@ -2,8 +2,9 @@ import { Request, Response } from "express";
 import xlsx from "xlsx";
 import bcrypt from "bcrypt";
 import { User } from "../../model/user.model";
+import { sendEmail } from "./email";
 
-export const addStudents = async(req: Request, res: Response)=>{
+export const addStudents = async(req: Request, res: Response):Promise<any>=>{
      try {
         const file = (req as any).file;
 
@@ -26,6 +27,73 @@ export const addStudents = async(req: Request, res: Response)=>{
         console.log(users);
 
         const student = await User.insertMany(users, {ordered: false})
+
+        for (const user of users) {
+          await sendEmail(
+            user.email,
+            "Welcome to CDC",
+            `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Welcome to CDC</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" style="background-color: #ffffff; border-radius: 10px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <tr>
+            <td align="center" style="padding-bottom: 20px;">
+              <!-- Logo Placeholder -->
+              <img src="https://yt3.googleusercontent.com/pDqWRSkJM6LdfkkCFByEWK4lbIZsetVP17jR_edTMLxcsUcSO4nfmEAxyF4CSZTZMUHQ_G8q=s900-c-k-c0x00ffffff-no-rj" alt="CDC Logo" style="max-width: 120px;">
+            </td>
+          </tr>
+          <tr>
+            <td align="center">
+              <h1 style="color: #1d3557; font-size: 26px;">🎉 Welcome to CDC</h1>
+              <p style="color: #333; font-size: 16px; max-width: 500px; margin: 10px auto;">
+                Dear <strong>${user.name}</strong>,<br /><br />
+                We're thrilled to welcome you to the <strong>Career Development Cell (CDC)</strong>! Get ready to explore amazing opportunities, events, and resources to elevate your career journey.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="margin-top: 20px;">
+              <a href="[PORTAL_URL]" style="display: inline-block; background-color: #007bff; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-size: 16px;">
+                Visit CDC Portal
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding-top: 30px;">
+              <p style="color: #666; font-size: 14px;">
+                Need help? Just reply to this email — we’re here for you.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding: 20px 0;">
+              <!-- Social Media Icons -->
+              <a href="#"><img src="[FACEBOOK_ICON]" alt="Facebook" style="width: 24px; margin: 0 10px;"></a>
+              <a href="#"><img src="[INSTAGRAM_ICON]" alt="Instagram" style="width: 24px; margin: 0 10px;"></a>
+              <a href="#"><img src="[LINKEDIN_ICON]" alt="LinkedIn" style="width: 24px; margin: 0 10px;"></a>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="font-size: 12px; color: #aaa; padding-top: 10px;">
+              © 2025 Career Development Cell. All rights reserved.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`
+          );
+        }
 
       res.status(200).json({message:"Successfully student created",success:true, student, StudentsCount: student.length})
      } catch (error) {

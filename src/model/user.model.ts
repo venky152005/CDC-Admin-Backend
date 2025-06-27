@@ -6,6 +6,8 @@ export interface IUser extends mongoose.Document {
     year: string;
     email: string;
     password: string;
+    otp: string;
+    otpExpires: Date;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -16,6 +18,8 @@ const userSchema = new mongoose.Schema<IUser>({
     year: {type: String },
     email: { type: String},
     password: { type: String, },
+    otp: { type: String },
+    otpExpires: { type: Date },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
